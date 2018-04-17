@@ -2,6 +2,8 @@
 
 const express = require('express');
 const data = require('./db/notes');
+const simDB = require('./db/simDB');  
+const notes = simDB.initialize(data); 
 const {PORT} = require('./config');
 const {logger} = require('./middleware/logger.js');
 const app = express();
@@ -14,11 +16,16 @@ app.use(logger);
 
 
 
-app.get('/api/notes', (req, res) => {
-  let searchInput = req.query.searchTerm;
+app.get('/api/notes', (req, res, next) => {
+  let {searchTerm} = req.query;
+  console.log(searchTerm);
+  notes.filter(searchTerm, (err,list) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(list);
+  });
 
-  //MENTOR SESSION: WHY DON'T I NEED TO RETURN?
-  (!searchInput) ? res.json(data) : res.json(data.filter(items => items.title.includes(searchInput)));
 
 });
 
@@ -30,9 +37,7 @@ app.get('/api/notes/:id', (req, res) => {
 
 });
 
-app.get('/boom', (req, res, next) => {
-  throw new Error('Boom!!');
-});
+
 
 
 
