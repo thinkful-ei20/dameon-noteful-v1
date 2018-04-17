@@ -19,6 +19,7 @@ app.use(logger);
 app.get('/api/notes', (req, res, next) => {
   let {searchTerm} = req.query;
   console.log(searchTerm);
+  
   notes.filter(searchTerm, (err,list) => {
     if (err) {
       return next(err);
@@ -29,11 +30,17 @@ app.get('/api/notes', (req, res, next) => {
 
 });
 
-app.get('/api/notes/:id', (req, res) => {
-  const id = req.params.id;
-  const item= data.find(item => item.id === Number(id));
-  console.log(id);
-  return res.json(item);
+app.get('/api/notes/:id', (req, res, next) => {
+  const {id} = req.params;
+  
+  notes.find(id, (err, item) => {
+    if (err) {
+      return next(err);
+    }
+    return res.json(item);
+  });
+  
+  
 
 });
 
