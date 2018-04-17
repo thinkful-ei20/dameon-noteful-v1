@@ -1,34 +1,119 @@
 'use strict';
 
-const data = require('./db/notes');
 const express = require('express');
+const data = require('./db/notes');
+const {PORT} = require('./config');
+const {logger} = require('./middleware/logger.js');
 const app = express();
 
-app.use(express.static('public'));
 
-app.get('/api/notes/:id', (req,res) => {
-  console.info(req.params);
-  let id = Number(req.params.id);
-  let item = data.find(item => item.id === id);
-  res.json(item);
-  console.info(id);
-});
+
+app.use(express.static('public'));
+app.use(logger);
+
+
 
 
 app.get('/api/notes', (req, res) => {
-  let searchTerm = req.query.searchTerm;
-  let itemsToReturn = data.filter(item => item.title.includes(searchTerm));
-  
-  res.json(itemsToReturn);
-  
+  let searchInput = req.query.searchTerm;
+
+  //MENTOR SESSION: WHY DON'T I NEED TO RETURN?
+  (!searchInput) ? res.json(data) : res.json(data.filter(items => items.title.includes(searchInput)));
+
 });
 
-app.listen(8080,function(){
-  console.info(`Server listening on ${this.address().port}`);
-}).on('error',error => {
-  console.error(error);
+app.get('/api/notes/:id', (req, res) => {
+  const id = req.params.id;
+  const item= data.find(item => item.id === Number(id));
+  console.log(id);
+  return res.json(item);
+
 });
+
+app.use(function (req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  res.status(404).json({ message: 'Not Found' });
+});
+
+// Listen for incoming connections
+app.listen(PORT, function () {
+  console.info(`Server listening on ${this.address().port}`);
+}).on('error', err => {
+  console.error(err);
+});
+
+
+
 
 console.log('Hello Noteful!');
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // INSERT EXPRESS APP CODE HERE...
+//--------------------------------------------------------------------
+// const create = function() {
+//   console.log('insert into database');
+// };
+
+// const read = function() {
+//   console.log('read from database');
+// };
+
+// const update = function() {
+//   console.log('update database');
+// };
+
+// const remove = function() {
+//   console.log('remove from database');
+// };
+
+// module.exports = {create, read, update, remove};
+
+// const {create, read, update, remove} = require('./models/storage');
+
+// create();
+// read();
+// update();
+// remove();
+//----------------------------------------------------------------------------
+// 'Access-Control-Allow-Origin', '*'
+// 'Access-Control-Allow-Headers', 'Content-Type'
+// 'Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE'
+//---------------------------------------------------------------------------
+// app.use(function (err, req, res, next) {
+//   console.error(err.stack)
+//   res.status(500).send('Something broke!')
+// });
+
