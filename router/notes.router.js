@@ -80,16 +80,6 @@ router.put('/:id', (req, res, next) => {
 
 
 
-// notes.update(id, updateObj, (err, item) => {
-//   if (err) {
-//     return next(err);
-//   }
-//   if (item) {
-//     res.json(item);
-//   } else {
-//     next();
-//   }
-// });
 
 
 
@@ -102,43 +92,37 @@ router.post('/', (req,res,next) => {
     err.status = 400;
     return next(err);
   }
-  notes.create(newItem, (err,item)=>{
-    if (err) {
-      return next(err);
-    }
-    if (item){
+  notes.create(newItem).then( item =>{
+    if (item) {
       res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+    } else {
+      next();
     }
-    else {next();}
+  }).catch( err => {
+    return next(err);
   });
 });
+
+
+
+
 
 
 router.delete('/:id', (req, res, next) => {
-  notes.delete(req.params.id,err => {
-
-    if(err){
-      res.status=500;
-      next(err);
-    
+  notes.delete(req.params.id).then(()=>{
+    if(req.params.id){
+      res.status(204).end();
+    } else {
+      next();
     }
-    res.status(204).end();
+  }).catch(err => {
+    res.status=500;
+    next(err);
   });
-  
-  
+   
+   
+   
+    
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module.exports = router;
+  
+  module.exports = router;
