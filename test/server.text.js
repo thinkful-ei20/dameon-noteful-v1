@@ -27,6 +27,7 @@ describe('Express static', function () {
         expect(res).to.exist;
         expect(res).to.have.status(200);
         expect(res).to.be.html;
+        
       });
   });
 });
@@ -43,19 +44,66 @@ describe('404 handler', function (){
 });
 
 
+describe('GET all notes', function(){
+
+  it('should return all notes',function(){
+    return chai.request(app)
+      .get('/api/notes')
+      .then(function(res) {
+        expect(res.body).to.have.lengthOf(10);
+        res.body.forEach(function(item){
+          expect(item).to.have.all.keys('id','title','content');
+
+        });
+
+      });
+  });
+});
+
+describe('GET note by search term', function(){
+  it('should return a list based on search term',function(){
+    return chai.request(app)
+      .get('/api/notes/?searchTerm=cats')
+      .then(function(res){
+        expect(res).to.have.status(200);
+      });
+  });
+
+});
+describe('GET note by search term', function(){
+  it('should return an error ',function(){
+    return chai.request(app)
+      .get('/api/notes/?searchTerm=pudddingpie')
+      .then(function(res){
+        expect(res.body).to.have.lengthOf(0);
+      });
+  });
+
+});
 
 
 
 
 
+describe('GET note by ID',function(){
+  it('should return the corret note',function(){
+    return chai.request(app)
+      .get('/api/notes/1001')
+      .then(function(res){
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.all.keys('id','title','content');
+        expect(res.body.id).to.equal(1001);
+      });
+  });
+});
 
-
-
-
-
-
-
-
-
-
-
+describe('GET note by ID',function(){
+  it('should return the corret note',function(){
+    return chai.request(app)
+      .get('/api/notes/4001')
+      .then(function(res){
+        expect(res).to.have.status(404);
+              
+      });
+  });
+});
