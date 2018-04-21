@@ -88,7 +88,8 @@ router.post('/', (req,res,next) => {
   const {title,content} = req.body;
   const newItem ={title, content};
   if(!newItem.title ){
-    const err = new Error(`Missing ${title} in request body`);
+    const err = new Error(`Missing title in request body`);
+    
     err.status = 400;
     return next(err);
   }
